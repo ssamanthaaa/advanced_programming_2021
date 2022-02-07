@@ -42,17 +42,20 @@ class stack_pool {
   stack_type new_stack();  // return an empty stack
 
   void reserve(size_type n);   // reserve n nodes in the pool
-  size_type capacity() const;  // the capacity of the pool
-
-  bool empty(stack_type x) const;
+  size_type capacity() const { // the capacity of the pool
+    // return pool.capacity();
+  }
+  bool empty(stack_type x) const { // forse noexcept
+    return x == end();
+  }
 
   stack_type end() const noexcept { return stack_type(0); }
 
-  T& value(stack_type x);
-  const T& value(stack_type x) const;
+  T& value(stack_type x) { return node(x).value; }
+  const T& value(stack_type x) const { return node(x).value; }
 
-  stack_type& next(stack_type x);
-  const stack_type& next(stack_type x) const;
+  stack_type& next(stack_type x) { return node(x).next; }
+  const stack_type& next(stack_type x) const { return node(x).next; }
 
   stack_type push(const T& val, stack_type head);
   stack_type push(T&& val, stack_type head);
