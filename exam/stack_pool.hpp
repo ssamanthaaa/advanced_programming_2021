@@ -20,6 +20,27 @@ class stack_pool {
   node_t& node(stack_type x) noexcept { return pool[x - 1]; }
   const node_t& node(stack_type x) const noexcept { return pool[x - 1]; }
 
+  /**
+   * Function to push a new value in the stack
+   * If the first empty node is the last then we create a new node, we used emplace_back so the object is constructed directly
+   * If the frist empty node is not the last this means that we have some free space somewhere.
+   */
+  template <typename X>
+  stack_type _push(X&& val, stack_type head) {
+    // I have to push into the vector a new node
+    if (free_nodes == end()) { // == empty(free_nodes)
+      pool.emplace_back(std::forward<X>(x)) 
+      return pool.size();// next free node is the last
+    } 
+    else { // we have a free space somewhere
+      stack_type new_head = free_nodes; 
+      free_nodes = next(free_nodes); // we update free_nodes with the next position
+      value(new_head) =std::forward<X>(val);
+      next(new_head) = head; // the next of the new_head is the previous head
+      return new_head;
+    }
+  }
+
  public:
   stack_pool() : pool{}, free_nodes{end()} {};
 
@@ -57,8 +78,12 @@ class stack_pool {
   stack_type& next(stack_type x) { return node(x).next; }
   const stack_type& next(stack_type x) const { return node(x).next; }
 
-  stack_type push(const T& val, stack_type head);
-  stack_type push(T&& val, stack_type head);
+  stack_type push(const T& val, stack_type head) {
+    return _push(val, head);
+  }
+  stack_type push(T&& val, stack_type head) {
+    return _push(std::move(val), head);
+  }
 
   stack_type pop(stack_type x);  // delete first node
 
