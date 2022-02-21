@@ -47,7 +47,9 @@ class stack_pool {
  public:
   stack_pool() : pool{}, free_nodes{end()} {};
 
-  explicit stack_pool(size_type n);  // reserve n nodes in the pool
+  explicit stack_pool(size_type n): stack_pool{} {
+    reserve(n);
+  };  // reserve n nodes in the pool
 
   ~stack_pool() = default;
 
@@ -65,10 +67,15 @@ class stack_pool {
 
   stack_type new_stack();  // return an empty stack
 
-  void reserve(size_type n);   // reserve n nodes in the pool
+  void reserve(size_type n){
+    // what if n<0 or n<capacity ??
+    pool.reserve(n);
+  };   // reserve n nodes in the pool
+
   size_type capacity() const { // the capacity of the pool
     // return pool.capacity();
   }
+
   bool empty(stack_type x) const { // forse noexcept
     return x == end();
   }
@@ -88,7 +95,13 @@ class stack_pool {
     return _push(std::move(val), head);
   }
 
-  stack_type pop(stack_type x);  // delete first node
+  stack_type pop(stack_type x){
+    // what if x is empty or does not exists?
+    auto new_head = next(x);
+    next(x) = free_nodes;
+    free_nodes = x;
+    return new_head;
+  };  // delete first node
 
   stack_type free_stack(stack_type x);  // free entire stack
 };
