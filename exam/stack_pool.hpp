@@ -29,7 +29,7 @@ class stack_pool {
   stack_type _push(X&& val, stack_type head) {
     // I have to push into the vector a new node
     if (free_nodes == end()) { // == empty(free_nodes)
-      pool.emplace_back(std::forward<X>(x)) 
+      pool.emplace_back(std::forward<X>(val));
       return pool.size();// next free node is the last
     } 
     else { // we have a free space somewhere
