@@ -97,10 +97,14 @@ class stack_pool {
 
   stack_type pop(stack_type x){
     // what if x is empty or does not exists?
-    auto new_head = next(x);
-    next(x) = free_nodes;
-    free_nodes = x;
-    return new_head;
+    if (empty(x)) {
+      return end();
+    } else {
+      auto new_head = next(x);
+      next(x) = free_nodes;
+      free_nodes = x;
+      return new_head;
+    }
   };  // delete first node
 
   stack_type free_stack(stack_type x);  // free entire stack
