@@ -28,9 +28,9 @@ class stack_pool {
   template <typename X>
   stack_type _push(X&& val, stack_type head) {
     // I have to push into the vector a new node
-    if (free_nodes == end()) { // == empty(free_nodes)
-      pool.emplace_back(std::forward<X>(val));
-      return pool.size();// next free node is the last
+    if (empty(free_nodes)) {
+      pool.emplace_back(std::forward<X>(val), head);
+      return static_cast<stack_type>(pool.size());// next free node is the last
     } 
     else { // we have a free space somewhere
       stack_type new_head = free_nodes; 
