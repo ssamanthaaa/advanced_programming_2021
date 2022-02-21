@@ -9,6 +9,9 @@ class stack_pool {
 
     node_t() = default;
 
+    // should I check next>=0 ?
+    explicit node_t(T value, N next): value{value}, next{next} {};
+
     ~node_t() = default;
   };
   std::vector<node_t> pool;
