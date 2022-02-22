@@ -1,6 +1,43 @@
 #include <iostream>
 #include <vector>
 
+template <typename SP, typename ST, typename V> 
+class _iterator {
+  SP* pool;
+  ST current; // current head
+public:
+  using value_type = V;
+  using stack_type = ST;
+  using stack_pool = SP;
+  using reference = value_type&;
+  using pointer = value_type*;
+  using difference_type = std::ptrdiff_t;
+  using iterator_category = std::forward_iterator_tag;
+  
+  explicit _iterator(stack_pool* p, stack_type head) : pool{p}, current{head} {}
+  
+  reference operator*() const noexcept { return pool->value(current); }
+
+  _iterator& operator++() { // pre-increment
+    current = pool->next(current);
+    return *this;
+  }
+
+  _iterator operator++(int) { // post_increment
+    auto tmp = *this;
+    ++(*this);
+    return tmp;
+  }
+
+  friend bool operator==(const _iterator& x, const _iterator& y) noexcept {
+    return x.current == y.current;
+  }
+
+  friend bool operator!=(const _iterator& x, const _iterator& y) noexcept {
+    return !(x == y);
+  }
+};
+
 template <typename T, typename N = std::size_t>
 class stack_pool {
   struct node_t {
@@ -26,7 +63,7 @@ class stack_pool {
   /**
    * Function to push a new value in the stack
    * If the first empty node is the last then we create a new node, we used emplace_back so the object is constructed directly
-   * If the frist empty node is not the last this means that we have some free space somewhere.
+   * If the first empty node is not the last this means that we have some free space somewhere.
    */
   template <typename X>
   stack_type _push(X&& val, stack_type head) {
