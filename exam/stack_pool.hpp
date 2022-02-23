@@ -2,6 +2,12 @@
 #include <vector>
 #include "ap_error.hpp"
 
+struct Invalind_input {
+  std::string message;  // member_var
+  Invalind_input(std::string s) : message{std::move(s)} {}  // constructor;
+  const char* what() const { return message.c_str(); }  // what() method
+};
+
 template <typename SP, typename ST, typename V>
 class _iterator {
   SP* pool;
