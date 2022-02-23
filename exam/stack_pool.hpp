@@ -115,7 +115,7 @@ class stack_pool {
   };  // reserve n nodes in the pool
 
   size_type capacity() const {  // the capacity of the pool
-    // return pool.capacity();
+    return pool.capacity();
   }
 
   bool empty(stack_type x) const {  // forse noexcept
@@ -145,7 +145,7 @@ class stack_pool {
       free_nodes = x;
       return new_head;
     }
-  };  // delete first node
+  }  // delete first node
 
   /**
    * Function to free a single stack. The stack is resetted to its initial
@@ -157,5 +157,29 @@ class stack_pool {
       x = this->pop(x);
     }
     return (x);
-  };  // free entire stack
+  } // free entire stack
+
+  /**
+   * Function to print a single stack
+  */
+  void print_stack(stack_type x) {
+    auto start = begin(x);
+    std::cout << "[ ";
+    while (start != end(x)) {
+        std::cout << *start << " ";
+        ++start;
+    }
+    std::cout << "]" << std::endl;
+  }
+
+  /**
+   * Function to print the all pool
+  */
+  void print_pool() {
+    std::cout << "pool = [ ";
+    for (auto i = 0; i < pool.size(); ++i) {
+        std::cout << pool.at(i).value << " ";
+    }
+    std::cout << "]" << std::endl;
+  }
 };
