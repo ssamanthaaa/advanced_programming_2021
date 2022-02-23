@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "ap_error.hpp"
 
 template <typename SP, typename ST, typename V>
 class _iterator {
@@ -47,7 +48,7 @@ class stack_pool {
     node_t() = default;
 
     // should I check next>=0 ?
-    explicit node_t(T value, N next) : value{value}, next{next} {};
+    node_t(T&& value, N next) : value{std::forward<T>(val)}, next{next} {};
 
     ~node_t() = default;
   };
@@ -62,21 +63,18 @@ class stack_pool {
 
   /**
    * Function to push a new value in the stack
-   * If the first empty node is the last then we create a new node, we used
-   * emplace_back so the object is constructed directly If the first empty node
-   * is not the last this means that we have some free space somewhere.
+   * If the first empty node is the last then we create a new node directly inside our pool with emplace_back
+   * If the first empty node is not the last this means that we have some free space somewhere, so there is no need to create a node.
+   * 
    */
   template <typename X>
   stack_type _push(X&& val, stack_type head) {
-    // I have to push into the vector a new node
     if (empty(free_nodes)) {
       pool.emplace_back(std::forward<X>(val), head);
-      return static_cast<stack_type>(
-          pool.size());  // next free node is the last
-    } else {             // we have a free space somewhere
+      return static_cast<stack_type>(pool.size()); 
+    } else {
       stack_type new_head = free_nodes;
-      free_nodes =
-          next(free_nodes);  // we update free_nodes with the next position
+      free_nodes = next(free_nodes);  // we update free_nodes with the next position
       value(new_head) = std::forward<X>(val);
       next(new_head) = head;  // the next of the new_head is the previous head
       return new_head;
@@ -111,6 +109,8 @@ class stack_pool {
 
   void reserve(size_type n) {
     // what if n<0 or n<capacity ??
+    AP_ASSERT_GT(n,0);
+    AP_ASSERT_GT(n, capacity());
     pool.reserve(n);
   };  // reserve n nodes in the pool
 
