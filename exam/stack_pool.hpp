@@ -55,7 +55,7 @@ class stack_pool {
 
     // should I check next>=0 ?
     template <typename X>
-    node_t(X&& value, N next) : value{std::forward<X>(val)}, next{next} {};
+    node_t(X&& val, N next) : value{std::forward<X>(val)}, next{next} {};
 
     ~node_t() = default;
   };
@@ -97,7 +97,7 @@ class stack_pool {
 
   ~stack_pool() = default;
 
-  using iterator = _iterator<stack_pool, stack_type, value_type>
+  using iterator = _iterator<stack_pool, stack_type, value_type>;
   using const_iterator = _iterator<stack_pool, stack_type, const value_type>;
 
   iterator begin(stack_type x) { return iterator(this, x); }
