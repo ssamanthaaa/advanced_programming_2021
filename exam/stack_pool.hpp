@@ -2,10 +2,12 @@
 #include <vector>
 #include "ap_error.hpp"
 
-struct Invalind_input {
-  std::string message;  // member_var
-  Invalind_input(std::string s) : message{std::move(s)} {}  // constructor;
-  const char* what() const { return message.c_str(); }  // what() method
+/**
+ * A simple class to handle wrong inputs
+ */
+struct Invalind_input: public std::runtime_error{
+  using std::runtime_error::runtime_error; // using the same constructors
+                                           // of the parent
 };
 
 template <typename SP, typename ST, typename V>
