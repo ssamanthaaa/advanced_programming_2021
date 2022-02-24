@@ -191,7 +191,7 @@ class stack_pool {
   /**
    * Function to print a single stack
   */
-  void print_stack(stack_type x) {
+  void print_stack(const stack_type x) {
     auto start = begin(x);
     std::cout << "[ ";
     while (start != end(x)) {
