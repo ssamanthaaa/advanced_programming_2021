@@ -51,13 +51,13 @@ class _iterator {
   /** Dereference operator to get the value of the current node */
   reference operator*() const noexcept { return pool->value(current); }
 
-  /** Pre-increment operator to pass in the next node of the stack */
+  /** A pre-increment operator. It is used to increment the iterator before returning the value */
   _iterator& operator++() {  // pre-increment
     current = pool->next(current);
     return *this;
   }
 
-  /** Post-increment operator to pass in the next node of the stack */
+  /** A post-increment operator. It is used to increment the iterator before returning the value. */
   _iterator operator++(int) {  // post_increment
     auto tmp = *this;
     ++(*this);
@@ -75,15 +75,20 @@ class _iterator {
   }
 };
 
+/** @brief A template class that takes two template parameters.*/
 template <typename T, typename N = std::size_t>
 class stack_pool {
+  /* A struct that contains two members: value and next. */
   struct node_t {
     T value;
     N next;
 
     node_t() = default;
 
-    // should I check next>=0 ?
+    /**
+     * @brief A constructor of the node_t struct. It is used to create a new
+     * node in the pool.
+     */
     template <typename X>
     node_t(X&& val, N next) : value{std::forward<X>(val)}, next{next} {};
 
@@ -95,7 +100,13 @@ class stack_pool {
   using size_type = typename std::vector<node_t>::size_type;
   stack_type free_nodes;  // at the beginning, it is empty
 
+  /**
+   * @brief  Returning a reference to the node_t struct that is stored in the pool at the index x-1.
+   */
   node_t& node(stack_type x) noexcept { return pool[x - 1]; }
+  /**
+   * @brief Returning a const reference to the node_t struct that is stored in the pool at the index x-1.
+   */
   const node_t& node(stack_type x) const noexcept { return pool[x - 1]; }
 
   /**
