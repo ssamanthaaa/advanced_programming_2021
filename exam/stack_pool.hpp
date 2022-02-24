@@ -2,12 +2,26 @@
 #include <iostream>
 #include <vector>
 
+/**
+ * @brief An ERROR to check if the passed stack to a method is valid.
+ *
+ * In this case the stack is considered valid also if its head is empty. Of
+ * course it can not be greater than the index of the last node of the pool.
+ *
+ */
 #define AP_ERROR_CUSTOM_POSITIVE(a)                                            \
   AP_ERROR(((a >= size_type{end()}) && (a <= pool.size())), Invalid_input)     \
       << "The stack must be >= " << end() << " and <= " << pool.size() << "."  \
       << "\n"                                                                  \
       << "You have passed: " << a << "." << std::endl;
 
+/**
+ * @brief An ERROR to check if the passed stack to a method is valid.
+ *
+ * In this case if the stack is empty it is not considered valid. Of course it
+ * can not be greater than the index of the last node of the pool.
+ *
+ */
 #define AP_ERROR_CUSTOM_STRICT_POSITIVE(a)                                     \
   AP_ERROR(((a > size_type{end()}) && (a <= pool.size())), Invalid_input)      \
       << "The stack must be > " << end() << " and <= " << pool.size() << "."   \
@@ -22,15 +36,13 @@ struct Invalid_input : public std::runtime_error {
                                             // of the parent
 };
 
-
 /**
  * @brief A class to iterate through the stack_pool
- * 
+ *
  * The class is templated on stack_pool, stack_type and value_type
  */
 template <typename SP, typename ST, typename V>
 class _iterator {
-
   /** A pointer to the stack_pool that contains the stack on which we iterate */
   SP* pool;
 
@@ -51,25 +63,29 @@ class _iterator {
   /** Dereference operator to get the value of the current node */
   reference operator*() const noexcept { return pool->value(current); }
 
-  /** A pre-increment operator. It is used to increment the iterator before returning the value */
+  /** A pre-increment operator. It is used to increment the iterator before
+   * returning the value */
   _iterator& operator++() {  // pre-increment
     current = pool->next(current);
     return *this;
   }
 
-  /** A post-increment operator. It is used to increment the iterator before returning the value. */
+  /** A post-increment operator. It is used to increment the iterator before
+   * returning the value. */
   _iterator operator++(int) {  // post_increment
     auto tmp = *this;
     ++(*this);
     return tmp;
   }
 
-  /** Equal-equal operator for 2 iterators (return true if they "points" to the same node) */
+  /** Equal-equal operator for 2 iterators (return true if they "points" to the
+   * same node) */
   friend bool operator==(const _iterator& x, const _iterator& y) noexcept {
     return x.current == y.current;
   }
 
-  /** Not-equal operator for 2 iterators (return true if they are "pointing" to differen nodes) */
+  /** Not-equal operator for 2 iterators (return true if they are "pointing" to
+   * differen nodes) */
   friend bool operator!=(const _iterator& x, const _iterator& y) noexcept {
     return !(x == y);
   }
@@ -101,11 +117,13 @@ class stack_pool {
   stack_type free_nodes;  // at the beginning, it is empty
 
   /**
-   * @brief  Returning a reference to the node_t struct that is stored in the pool at the index x-1.
+   * @brief  Returning a reference to the node_t struct that is stored in the
+   * pool at the index x-1.
    */
   node_t& node(stack_type x) noexcept { return pool[x - 1]; }
   /**
-   * @brief Returning a const reference to the node_t struct that is stored in the pool at the index x-1.
+   * @brief Returning a const reference to the node_t struct that is stored in
+   * the pool at the index x-1.
    */
   const node_t& node(stack_type x) const noexcept { return pool[x - 1]; }
 
@@ -119,7 +137,8 @@ class stack_pool {
    */
   template <typename X>
   stack_type _push(X&& val, stack_type head) {
-    AP_ASSERT(head >= end(), Invalid_input) << "The head of a stack can not be negative" << std::endl;
+    AP_ASSERT(head >= end(), Invalid_input)
+        << "The head of a stack can not be negative" << std::endl;
     if (empty(free_nodes)) {
       pool.emplace_back(std::forward<X>(val), head);
       return static_cast<stack_type>(pool.size());
@@ -150,8 +169,11 @@ class stack_pool {
 
   ~stack_pool() = default;
 
-  using iterator = _iterator<stack_pool<value_type, stack_type>, stack_type, value_type>;
-  using const_iterator = _iterator<const stack_pool<value_type, stack_type>, stack_type, const value_type>;
+  using iterator =
+      _iterator<stack_pool<value_type, stack_type>, stack_type, value_type>;
+  using const_iterator = _iterator<const stack_pool<value_type, stack_type>,
+                                   stack_type,
+                                   const value_type>;
 
   /**
    * @brief Returning an iterator to the beginning of the stack.
