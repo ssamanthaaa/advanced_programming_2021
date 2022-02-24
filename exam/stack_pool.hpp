@@ -22,9 +22,19 @@ struct Invalid_input : public std::runtime_error {
                                             // of the parent
 };
 
+
+/**
+ * @brief A class to iterate through the stack_pool
+ * 
+ * The class is templated on stack_pool, stack_type and value_type
+ */
 template <typename SP, typename ST, typename V>
 class _iterator {
+
+  /** A pointer to the stack_pool that contains the stack on which we iterate */
   SP* pool;
+
+  /** The index in the pool of the current stack's node */
   ST current;  // current head
  public:
   using value_type = V;
@@ -35,25 +45,31 @@ class _iterator {
   using difference_type = std::ptrdiff_t;
   using iterator_category = std::forward_iterator_tag;
 
+  /** Constructor of the class */
   explicit _iterator(stack_pool* p, stack_type head) : pool{p}, current{head} {}
 
+  /** Dereference operator to get the value of the current node */
   reference operator*() const noexcept { return pool->value(current); }
 
+  /** Pre-increment operator to pass in the next node of the stack */
   _iterator& operator++() {  // pre-increment
     current = pool->next(current);
     return *this;
   }
 
+  /** Post-increment operator to pass in the next node of the stack */
   _iterator operator++(int) {  // post_increment
     auto tmp = *this;
     ++(*this);
     return tmp;
   }
 
+  /** Equal-equal operator for 2 iterators (return true if they "points" to the same node) */
   friend bool operator==(const _iterator& x, const _iterator& y) noexcept {
     return x.current == y.current;
   }
 
+  /** Not-equal operator for 2 iterators (return true if they are "pointing" to differen nodes) */
   friend bool operator!=(const _iterator& x, const _iterator& y) noexcept {
     return !(x == y);
   }
