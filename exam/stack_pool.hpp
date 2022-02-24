@@ -3,12 +3,13 @@
 #include "ap_error.hpp"
 
 /**
- * A simple class to handle wrong inputs
+ * @brief A simple class to handle wrong inputs
  */
 struct Invalind_input: public std::runtime_error{
   using std::runtime_error::runtime_error; // using the same constructors
                                            // of the parent
 };
+
 
 template <typename SP, typename ST, typename V>
 class _iterator {
@@ -71,10 +72,10 @@ class stack_pool {
   const node_t& node(stack_type x) const noexcept { return pool[x - 1]; }
 
   /**
-   * Function to push a new value in the stack
-   * If the first empty node is the last then we create a new node directly inside our pool with emplace_back
-   * If the first empty node is not the last this means that we have some free space somewhere, so there is no need to create a node.
+   * @brief Function to push a new value in the stack
    * 
+   * If the first empty node is the last then we create a new node directly inside our pool with emplace_back
+   * If the frist empty node is not the last this means that we have some free space somewhere, so there is no need to create a node.
    */
   template <typename X>
   stack_type _push(X&& val, stack_type head) {
@@ -91,8 +92,14 @@ class stack_pool {
   }
 
  public:
+  /**
+   * @brief Construct a new stack pool object
+   */
   stack_pool() : pool{}, free_nodes{end()} {};
 
+  /**
+   * @brief Construct a new stack pool object with capactiy equal to n
+   */
   explicit stack_pool(size_type n) : stack_pool{} {
     reserve(n);
   };  // reserve n nodes in the pool
@@ -102,20 +109,47 @@ class stack_pool {
   using iterator = _iterator<stack_pool, stack_type, value_type>;
   using const_iterator = _iterator<stack_pool, stack_type, const value_type>;
 
+
+  /**
+   * @brief Returning an iterator to the beginning of the stack.
+   */
   iterator begin(stack_type x) { return iterator(this, x); }
+
+  /**
+   * @brief Returning an iterator to the end of the stack
+   * 
+   */
   iterator end(stack_type) { return iterator(this, end()); } // this is not a typo
 
+  /**
+   * @brief Returning a const_iterator to the beginning of the stack.
+   */
   const_iterator begin(stack_type x) const { return const_iterator(this, x); }
+  
+  /**
+   * @brief Returning a const_iterator to the end of the stack.
+   */
   const_iterator end(stack_type) const  { return const_iterator(this, end()); }
 
+  /**
+   * @brief Returning a const_iterator to the beginning of the stack.
+   */
   const_iterator cbegin(stack_type x) const { return const_iterator(this, x); }
+  
+  /**
+   * @brief Returning a const_iterator to the end of the stack.
+   */
   const_iterator cend(stack_type) const { return const_iterator(this, end()); }
 
   /**
-   * Create an empty stack. Initial value is (std::size_t(0)).
+   * @brief Create an empty stack. Initial value is (std::size_t(0)).
    */
   stack_type new_stack() noexcept { return end(); };  // return an empty stack
 
+
+  /**
+   * @brief A function that reserves n nodes in the pool
+   */
   void reserve(size_type n) {
     AP_ASSERT_GT(n,0);
     AP_ASSERT_GT(n, capacity());
@@ -124,7 +158,7 @@ class stack_pool {
 
 
   /**
-   * @brief gives the capacity of the pool
+   * @brief Gives the capacity of the pool
    */
   size_type capacity() const {  // the capacity of the pool
     return pool.capacity();
@@ -139,7 +173,7 @@ class stack_pool {
 
   /**
    * @brief Returning the value 0, which is the index of the last node in the vector. 
-  */
+   */
   stack_type end() const noexcept { return stack_type(0); }
 
   
@@ -147,21 +181,32 @@ class stack_pool {
    * @brief Returning a reference to the value of the node. 
   */
   T& value(stack_type x) { return node(x).value; }
+
+  /**
+   * @brief Returning a const reference to the value of the node.
+   */
   const T& value(stack_type x) const { return node(x).value; }
 
   /**
    * @brief Returning a reference to the next node of the node x. 
   */
   stack_type& next(stack_type x) { return node(x).next; }
+
+  /**
+   * @brief Returning a const reference to the next node of the node x
+   */
   const stack_type& next(stack_type x) const { return node(x).next; }
 
+  /**
+   * @brief Function to push an element to the front of the stack
+   */
   stack_type push(const T& val, stack_type head) { return _push(val, head); }
   stack_type push(T&& val, stack_type head) {
     return _push(std::move(val), head);
   }
 
   /**
-   * Function to remove from the stack the last inserted node, that will be put in the free_nodes
+   * @brief Function to remove from the stack the last inserted node, that will be put in the free_nodes
   */
   stack_type pop(stack_type x) {
     // what if x is empty, does not exists or it is free_nodes?
@@ -176,7 +221,7 @@ class stack_pool {
   }  // delete first node
 
   /**
-   * Function to free a single stack. The stack is resetted to its initial
+   * @brief Function to free a single stack. The stack is resetted to its initial
    * value (std::size_t(0)). Its nodes are added to free_nodes.
    */
   stack_type free_stack(stack_type x) {
@@ -189,7 +234,7 @@ class stack_pool {
 
 
   /**
-   * Function to print a single stack
+   * @brief Function to print a single stack
   */
   void print_stack(const stack_type x) {
     auto start = begin(x);
@@ -202,7 +247,7 @@ class stack_pool {
   }
 
   /**
-   * Function to print the content of the pool
+   * @brief Function to print the content of the pool
   */
   void print_pool() {
     std::cout << "pool = [ ";
