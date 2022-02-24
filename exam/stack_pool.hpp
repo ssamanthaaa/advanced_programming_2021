@@ -123,8 +123,8 @@ class stack_pool {
 
   ~stack_pool() = default;
 
-  using iterator = _iterator<stack_pool, stack_type, value_type>;
-  using const_iterator = _iterator<stack_pool, stack_type, const value_type>;
+  using iterator = _iterator<stack_pool<value_type, stack_type>, stack_type, value_type>;
+  using const_iterator = _iterator<const stack_pool<value_type, stack_type>, stack_type, const value_type>;
 
   /**
    * @brief Returning an iterator to the beginning of the stack.
