@@ -3,14 +3,14 @@
 #include <vector>
 
 #define AP_ERROR_CUSTOM_POSITIVE(a)                                            \
-  AP_ERROR(((a >= end()) && (a <= stack_type{pool.size()})), Invalid_input)    \
+  AP_ERROR(((a >= end()) && (a <= static_cast<stack_type>(pool.size()))), Invalid_input)    \
       << "The stack must be >= " << end() << " and <= " << pool.size() << "."  \
       << "\n"                                                                  \
       << "You have passed: " << a                                              \
       << " (the value shown is casted in stack_type)." << std::endl;
 
 #define AP_ERROR_CUSTOM_STRICT_POSITIVE(a)                                     \
-  AP_ERROR(((a > end()) && (a <= stack_type{pool.size()})), Invalid_input)     \
+  AP_ERROR(((a > end()) && (a <= static_cast<stack_type>(pool.size()))), Invalid_input)     \
       << "The stack must be >= " << end() << " and <= " << pool.size() << "."  \
       << "\n"                                                                  \
       << "You have passed: " << a                                              \
@@ -19,7 +19,7 @@
 /**
  * @brief A simple class to handle wrong inputs
  */
-struct Invalind_input : public std::runtime_error {
+struct Invalid_input : public std::runtime_error {
   using std::runtime_error::runtime_error;  // using the same constructors
                                             // of the parent
 };
@@ -243,8 +243,7 @@ class stack_pool {
    */
   stack_type pop(stack_type x) {
     AP_ERROR_CUSTOM_STRICT_POSITIVE(x);
-    AP_ERROR(x == free_nodes, Invalid_input)
-        << "You can not pop from the stack of free_nodes" << std::endl;
+    AP_ERROR(x != free_nodes, Invalid_input) << "You can not pop from the stack of free_nodes" << std::endl;
     auto new_head = next(x);
     next(x) = free_nodes;
     free_nodes = x;
@@ -257,7 +256,7 @@ class stack_pool {
    */
   stack_type free_stack(stack_type x) {
     AP_ERROR_CUSTOM_STRICT_POSITIVE(x);
-    AP_ERROR(x == free_nodes, Invalid_input)
+    AP_ERROR(x != free_nodes, Invalid_input)
         << "You can not free the stack of free_nodes" << std::endl;
     while (!empty(x)) {
       x = this->pop(x);
