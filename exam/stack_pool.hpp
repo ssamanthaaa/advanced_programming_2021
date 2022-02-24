@@ -3,23 +3,21 @@
 #include <vector>
 
 #define AP_ERROR_CUSTOM_POSITIVE(a)                                            \
-  AP_ERROR(((a >= end()) && (a <= stack_type{pool.size()})), Invalid_input)    \
+  AP_ERROR(((a >= size_type{end()}) && (a <= pool.size())), Invalid_input)     \
       << "The stack must be >= " << end() << " and <= " << pool.size() << "."  \
       << "\n"                                                                  \
-      << "You have passed: " << a                                              \
-      << " (the value shown is casted in stack_type)." << std::endl;
+      << "You have passed: " << a << "." << std::endl;
 
 #define AP_ERROR_CUSTOM_STRICT_POSITIVE(a)                                     \
-  AP_ERROR(((a > end()) && (a <= stack_type{pool.size()})), Invalid_input)     \
-      << "The stack must be >= " << end() << " and <= " << pool.size() << "."  \
+  AP_ERROR(((a > size_type{end()}) && (a <= pool.size())), Invalid_input)      \
+      << "The stack must be > " << end() << " and <= " << pool.size() << "."   \
       << "\n"                                                                  \
-      << "You have passed: " << a                                              \
-      << " (the value shown is casted in stack_type)." << std::endl;
+      << "You have passed: " << a << "." << std::endl;
 
 /**
  * @brief A simple class to handle wrong inputs
  */
-struct Invalind_input : public std::runtime_error {
+struct Invalid_input : public std::runtime_error {
   using std::runtime_error::runtime_error;  // using the same constructors
                                             // of the parent
 };
@@ -94,6 +92,7 @@ class stack_pool {
    */
   template <typename X>
   stack_type _push(X&& val, stack_type head) {
+    AP_ASSERT(head >= end(), Invalid_input) << "The head of a stack can not be negative" << std::endl;
     if (empty(free_nodes)) {
       pool.emplace_back(std::forward<X>(val), head);
       return static_cast<stack_type>(pool.size());
@@ -111,12 +110,14 @@ class stack_pool {
   /**
    * @brief Construct a new stack pool object
    */
-  stack_pool() : pool{}, free_nodes{end()} {};
+  stack_pool() noexcept : pool{}, free_nodes{end()} {};
 
   /**
    * @brief Construct a new stack pool object with capactiy equal to n
    */
   explicit stack_pool(size_type n) : stack_pool{} {
+    AP_ERROR(n >= end(), Invalid_input)
+        << "You can not reserve negative space in the pool" << std::endl;
     reserve(n);
   };  // reserve n nodes in the pool
 
@@ -128,35 +129,48 @@ class stack_pool {
   /**
    * @brief Returning an iterator to the beginning of the stack.
    */
-  iterator begin(stack_type x) { return iterator(this, x); }
+  iterator begin(stack_type x) {
+    AP_ERROR_CUSTOM_POSITIVE(x);
+    return iterator(this, x);
+  }
 
   /**
    * @brief Returning an iterator to the end of the stack
    *
    */
-  iterator end(stack_type) {
+  iterator end(stack_type) noexcept {
     return iterator(this, end());
   }  // this is not a typo
 
   /**
    * @brief Returning a const_iterator to the beginning of the stack.
    */
-  const_iterator begin(stack_type x) const { return const_iterator(this, x); }
+  const_iterator begin(stack_type x) const {
+    AP_ERROR_CUSTOM_POSITIVE(x);
+    return const_iterator(this, x);
+  }
 
   /**
    * @brief Returning a const_iterator to the end of the stack.
    */
-  const_iterator end(stack_type) const { return const_iterator(this, end()); }
+  const_iterator end(stack_type) const noexcept {
+    return const_iterator(this, end());
+  }
 
   /**
    * @brief Returning a const_iterator to the beginning of the stack.
    */
-  const_iterator cbegin(stack_type x) const { return const_iterator(this, x); }
+  const_iterator cbegin(stack_type x) const {
+    AP_ERROR_CUSTOM_POSITIVE(x);
+    return const_iterator(this, x);
+  }
 
   /**
    * @brief Returning a const_iterator to the end of the stack.
    */
-  const_iterator cend(stack_type) const { return const_iterator(this, end()); }
+  const_iterator cend(stack_type) const noexcept {
+    return const_iterator(this, end());
+  }
 
   /**
    * @brief Create an empty stack. Initial value is (std::size_t(0)).
@@ -167,8 +181,8 @@ class stack_pool {
    * @brief A function that reserves n nodes in the pool
    */
   void reserve(size_type n) {
-    AP_ASSERT_GT(n, 0);
-    AP_ASSERT_GT(n, capacity());
+    AP_ERROR(n >= end(), Invalid_input)
+        << "You can not reserve negative space in the pool" << std::endl;
     pool.reserve(n);
   };  // reserve n nodes in the pool
 
@@ -243,7 +257,7 @@ class stack_pool {
    */
   stack_type pop(stack_type x) {
     AP_ERROR_CUSTOM_STRICT_POSITIVE(x);
-    AP_ERROR(x == free_nodes, Invalid_input)
+    AP_ERROR(x != free_nodes, Invalid_input)
         << "You can not pop from the stack of free_nodes" << std::endl;
     auto new_head = next(x);
     next(x) = free_nodes;
@@ -257,7 +271,7 @@ class stack_pool {
    */
   stack_type free_stack(stack_type x) {
     AP_ERROR_CUSTOM_STRICT_POSITIVE(x);
-    AP_ERROR(x == free_nodes, Invalid_input)
+    AP_ERROR(x != free_nodes, Invalid_input)
         << "You can not free the stack of free_nodes" << std::endl;
     while (!empty(x)) {
       x = this->pop(x);
@@ -268,7 +282,7 @@ class stack_pool {
   /**
    * @brief Function to print a single stack
    */
-  void print_stack(const stack_type x) {
+  void print_stack(const stack_type x) const {
     AP_ERROR_CUSTOM_POSITIVE(x);
     auto start = begin(x);
     std::cout << "[ ";
@@ -282,7 +296,7 @@ class stack_pool {
   /**
    * @brief Function to print the content of the pool
    */
-  void print_pool() {
+  void print_pool() const noexcept {
     std::cout << "pool = [ ";
     for (auto i = 0; i < pool.size(); ++i) {
       std::cout << pool.at(i).value << " ";
