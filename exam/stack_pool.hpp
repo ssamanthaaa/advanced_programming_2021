@@ -1,6 +1,7 @@
 #include "ap_error.hpp"
 #include <iostream>
 #include <vector>
+#include <iterator>
 
 #define AP_ERROR_CUSTOM_POSITIVE(a)                                            \
   AP_ERROR(((a >= size_type{end()}) && (a <= pool.size())), Invalid_input)     \
