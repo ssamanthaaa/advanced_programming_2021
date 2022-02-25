@@ -246,7 +246,7 @@ class stack_pool {
   /**
    * @brief Checking if the given stack is empty or not
    */
-  bool empty(stack_type x) const {  // forse noexcept
+  bool empty(stack_type x) const {
     AP_ERROR_CUSTOM_POSITIVE(x);
     return x == end();
   }
